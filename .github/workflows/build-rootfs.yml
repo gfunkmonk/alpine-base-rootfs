@@ -32,7 +32,7 @@ jobs:
       - name: Install Host Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y qemu-user-static binfmt-support zstd
+          sudo apt-get install -y qemu-user-static binfmt-support zstd jq curl
       - name: Read Alpine version
         id: alpine-version
         run: echo "version=$(grep '^ALPINE_VERSION=' setup-base-rootfs.sh | cut -d= -f2 | tr -d '"')" >> "$GITHUB_OUTPUT"
