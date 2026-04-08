@@ -1,0 +1,56 @@
+name: Generate Alpine Base Rootfs
+
+on:
+  workflow_dispatch:
+    inputs:
+      architecture:
+        description: 'Architecture (x86_64, aarch64, i686, armv7, armhf)'
+        required: true
+        default: 'x86_64'
+        type: choice
+        options:
+          - x86_64
+          - aarch64
+          - i686
+          - armv7
+          - armhf
+      extra_packages:
+        description: 'Extra packages to bake into the rootfs (space separated)'
+        required: false
+        default: ''
+jobs:
+  generate-rootfs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+      - name: Install Host Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-static binfmt-support zstd
+      - name: Run Rootfs Generator
+        run: |
+          # Ensure ARCH is exported for setup_arch in your script
+          export ARCH="${{ github.event.inputs.architecture }}"
+          # Pass the input box string as arguments to the script
+          sudo -E ./setup-base-rootfs.sh ${{ github.event.inputs.extra_packages }}
+      - name: Upload Rootfs Artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: alpine-base-${{ github.event.inputs.architecture }}
+          path: minirootfs/*.tar.zst
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: rootfs-${{ github.event.inputs.architecture }}-${{ github.run_id }}
+          name: "Alpine Base Rootfs: ${{ github.event.inputs.architecture }}"
+          files: minirootfs/*.tar.zst
+          body: |
+            ### Automated Alpine Base Build
+            - **Arch:** ${{ github.event.inputs.architecture }}
+            - **Extra Packages:** `${{ github.event.inputs.extra_packages || 'none' }}`
+            - **Base Tools:** build-base, mold, ccache, patch, clang, etc.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
