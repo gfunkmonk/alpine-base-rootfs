@@ -43,7 +43,7 @@ jobs:
           key: alpine-prebaked-${{ steps.alpine-version.outputs.version }}-${{ matrix.arch }}
       - name: Run Rootfs Generator
         run: |
-          chmod +x scripts/setup-base-rootfs.sh
+          chmod +x ./setup-base-rootfs.sh
           sudo env ARCH=${{ matrix.arch }} ./scripts/setup-base-rootfs.sh ${{ inputs.extra_packages }}
       - name: Upload Rootfs Artifact
         uses: actions/upload-artifact@v6
