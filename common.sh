@@ -142,7 +142,7 @@ unmount_chroot() {
       echo -e "${TOMATO}CI Environment detected. Forcing lazy unmount...${NC}"
       grep -F "$(pwd)/${CHROOTDIR}" /proc/mounts | cut -f2 -d" " | sort -r | xargs -r sudo umount -l 2>/dev/null || true
     else
-      read -p "DANGER - Do you want to lazy unmount? (y/n): " yn
+      read -r -p "DANGER - Do you want to lazy unmount? (y/n): " yn
       case $yn in
         [yY] ) grep -F "$(pwd)/${CHROOTDIR}" /proc/mounts | cut -f2 -d" " | sort -r | xargs -r sudo umount -l 2>/dev/null || true;;
         [nN] ) echo -e "${TOMATO}ERROR: Failed to unmount all filesystems in ${CHROOTDIR} after ${max_attempts} attempts${NC}" >&2; exit;;
@@ -282,8 +282,8 @@ mount_chroot() {
     sudo mkdir -p "./${CHROOTDIR}/${CCACHE_LOG_DIR}"
   fi
   if [ -n "${CROSS_COMPILE_HOST_PATH:-}" ]; then
-    mkdir -p "${CHROOTDIR}/opt/cross"
-    mountpoint -q "${CHROOTDIR}/opt/cross" || mount --bind --make-slave "$CROSS_COMPILE_HOST_PATH" "${CHROOTDIR}/opt/cross"
+    sudo mkdir -p "${CHROOTDIR}/opt/cross"
+    mountpoint -q "${CHROOTDIR}/opt/cross" || sudo mount --bind --make-slave "$CROSS_COMPILE_HOST_PATH" "${CHROOTDIR}/opt/cross"
     # Inject the compiler paths into the chroot's environment
     export CC="/opt/cross/bin/${CROSS_PREFIX}gcc"
     export AR="/opt/cross/bin/${CROSS_PREFIX}ar"
