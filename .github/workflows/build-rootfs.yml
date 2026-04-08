@@ -48,18 +48,35 @@ jobs:
       - name: Upload Rootfs Artifact
         uses: actions/upload-artifact@v6
         with:
-          name: alpine-base-${{ matrix.arch }}
-          path: minirootfs/*.tar.zst
-      - name: Create Release
+          name: rootfs-artifacts-${{ matrix.arch }}
+          path: minirootfs/alpine-base-${{ matrix.arch }}.tar.zst
+  create-release:
+    needs: generate-rootfs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v7
+        with:
+          path: all-rootfs
+          pattern: rootfs-artifacts-*
+          merge-multiple: true
+      - name: Create Single Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: rootfs-${{ matrix.arch }}-${{ github.run_id }}
-          name: "Alpine Base Rootfs: ${{ matrix.arch }}"
-          files: minirootfs/*.tar.zst
+          tag_name: rootfs-all-${{ github.run_id }}
+          name: "Alpine Base Rootfs: All Architectures"
+          make_latest: true
+          files: all-rootfs/*.tar.zst
           body: |
-            ### Automated Alpine Base Build
-            - **Arch:** ${{ matrix.arch }}
-            - **Extra Packages:** `${{ github.event.inputs.extra_packages || 'none' }}`
-            - **Base Tools:** build-base, mold, ccache, patch, clang, etc.
+            ### Consolidated Alpine Base Builds
+            Automated multi-arch rootfs generation.
+
+            **Included Architectures:**
+            - x86_64, x86, aarch64, armv7, armhf
+
+            **Extra Packages Baked In:**
+            `${{ github.event.inputs.extra_packages || 'none' }}`
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
