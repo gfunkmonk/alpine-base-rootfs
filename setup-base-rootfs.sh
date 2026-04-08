@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+ALPINE_VERSION="3.23.3"
+ALPINE_MAJOR_MINOR="${ALPINE_VERSION%.*}"
+
 EXTRA_PACKAGES=("$@")
 
 cd "$(dirname "$0")/.."

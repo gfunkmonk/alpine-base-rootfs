@@ -3,24 +3,27 @@ name: Generate Alpine Base Rootfs
 on:
   workflow_dispatch:
     inputs:
-      architecture:
-        description: 'Architecture (x86_64, aarch64, i686, armv7, armhf)'
-        required: true
-        default: 'x86_64'
-        type: choice
-        options:
-          - x86_64
-          - aarch64
-          - i686
-          - armv7
-          - armhf
       extra_packages:
         description: 'Extra packages to bake into the rootfs (space separated)'
         required: false
         default: ''
 jobs:
   generate-rootfs:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [x86_64, x86, aarch64, armv7, armhf]
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: x86
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+          - arch: armv7
+            runner: ubuntu-24.04-arm
+          - arch: armhf
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: write
     steps:
@@ -30,12 +33,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y qemu-user-static binfmt-support zstd
+      - name: Read Alpine version
+        id: alpine-version
+        run: echo "version=$(grep '^ALPINE_VERSION=' setup-base-rootfs.sh | cut -d= -f2 | tr -d '"')" >> "$GITHUB_OUTPUT"
+      - name: Cache Rootfs
+        uses: actions/cache@v5
+        with:
+          path: minirootfs/alpine-base-${{ matrix.arch }}.tar.zst
+          key: alpine-prebaked-${{ steps.alpine-version.outputs.version }}-${{ matrix.arch }}
       - name: Run Rootfs Generator
         run: |
-          # Ensure ARCH is exported for setup_arch in your script
-          export ARCH="${{ github.event.inputs.architecture }}"
-          # Pass the input box string as arguments to the script
-          sudo -E ./setup-base-rootfs.sh ${{ github.event.inputs.extra_packages }}
+          chmod +x scripts/setup-base-rootfs.sh
+          sudo env ARCH=${{ matrix.arch }} ./scripts/setup-base-rootfs.sh ${{ inputs.extra_packages }}
       - name: Upload Rootfs Artifact
         uses: actions/upload-artifact@v6
         with:
