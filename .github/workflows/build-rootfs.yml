@@ -48,17 +48,17 @@ jobs:
       - name: Upload Rootfs Artifact
         uses: actions/upload-artifact@v6
         with:
-          name: alpine-base-${{ github.event.inputs.architecture }}
+          name: alpine-base-${{ matrix.arch }}
           path: minirootfs/*.tar.zst
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: rootfs-${{ github.event.inputs.architecture }}-${{ github.run_id }}
-          name: "Alpine Base Rootfs: ${{ github.event.inputs.architecture }}"
+          tag_name: rootfs-${{ matrix.arch }}-${{ github.run_id }}
+          name: "Alpine Base Rootfs: ${{ matrix.arch }}"
           files: minirootfs/*.tar.zst
           body: |
             ### Automated Alpine Base Build
-            - **Arch:** ${{ github.event.inputs.architecture }}
+            - **Arch:** ${{ matrix.arch }}
             - **Extra Packages:** `${{ github.event.inputs.extra_packages || 'none' }}`
             - **Base Tools:** build-base, mold, ccache, patch, clang, etc.
         env:
