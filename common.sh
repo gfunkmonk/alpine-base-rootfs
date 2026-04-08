@@ -228,21 +228,6 @@ setup_alpine_chroot() {
   echo -e "${HELIOTROPE}= copy resolv.conf into chroot${NC}"
   cp /etc/resolv.conf "./${CHROOTDIR}/etc/" || \
     echo -e "${TAWNY}= WARNING: failed to copy resolv.conf — DNS may not work inside chroot${NC}"
-  if [ "${tarball}" != "base-setup" ]; then
-    echo -e "${PEACH}= copying ${tarball} into chroot${NC}"
-    cp distfiles/"${tarball}" "./${CHROOTDIR}/${tarball}"
-  fi
-  # bundled tools
-  echo -e "${SAND}= install prebuilt tools${NC}"
-  local src
-  for prebuilt in 7zz upx uasm curl jq mold; do
-    src="tools/${prebuilt}/${prebuilt}-${ARCH}"
-    if [[ ! -f "$src" ]]; then
-      echo -e "${CRIMSON}= ERROR: ${src} not found${NC}" >&2
-      exit 1
-    fi
-    cp "$src" "./${CHROOTDIR}/usr/local/bin/${prebuilt}"
-  done
 }
 
 ############################################################
