@@ -6,8 +6,8 @@ ALPINE_MAJOR_MINOR="${ALPINE_VERSION%.*}"
 
 EXTRA_PACKAGES=("$@")
 
-cd "$(dirname "$0")/.."
-source "$(dirname "$0")/../common.sh"
+#cd "$(dirname "$0")/.."
+source "$(dirname "$0")/common.sh"
 
 setup_arch
 [ -f minirootfs/"alpine-base-${ARCH}.tar.zst" ] && rm minirootfs/"alpine-base-${ARCH}.tar.zst"

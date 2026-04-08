@@ -44,7 +44,7 @@ jobs:
       - name: Run Rootfs Generator
         run: |
           chmod +x ./setup-base-rootfs.sh
-          sudo env ARCH=${{ matrix.arch }} ./scripts/setup-base-rootfs.sh ${{ inputs.extra_packages }}
+          sudo env ARCH=${{ matrix.arch }} ./setup-base-rootfs.sh ${{ inputs.extra_packages }}
       - name: Upload Rootfs Artifact
         uses: actions/upload-artifact@v6
         with:
