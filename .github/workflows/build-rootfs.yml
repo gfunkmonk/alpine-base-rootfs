@@ -26,6 +26,8 @@ jobs:
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: write
+    outputs:
+      alpine_version: ${{ steps.alpine-version.outputs.version }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
@@ -72,6 +74,8 @@ jobs:
           body: |
             ### Consolidated Alpine Base Builds
             Automated multi-arch rootfs generation.
+
+            **Alpine Linux Base Version:** ${{ needs.generate-rootfs.outputs.alpine_version }}
 
             **Included Architectures:**
             - x86_64, x86, aarch64, armv7, armhf
