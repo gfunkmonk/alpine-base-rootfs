@@ -4,7 +4,7 @@ set -e
 # Set directory name for the target chroot
 CHROOTDIR="${CHROOTDIR:-pasta}"
 
-ALPINE_VERSION="3.23.3"
+ALPINE_VERSION="3.23.4"
 ALPINE_MAJOR_MINOR="${ALPINE_VERSION%.*}"
 
 EXTRA_PACKAGES=("$@")
