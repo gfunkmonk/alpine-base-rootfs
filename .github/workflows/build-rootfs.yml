@@ -48,7 +48,7 @@ jobs:
           chmod +x ./setup-base-rootfs.sh
           sudo env ARCH=${{ matrix.arch }} ./setup-base-rootfs.sh ${{ inputs.extra_packages }}
       - name: Upload Rootfs Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: rootfs-artifacts-${{ matrix.arch }}
           path: minirootfs/alpine-base-${{ matrix.arch }}.tar.zst
@@ -59,13 +59,13 @@ jobs:
       contents: write
     steps:
       - name: Download All Artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: all-rootfs
           pattern: rootfs-artifacts-*
           merge-multiple: true
       - name: Create Single Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: rootfs-${{ needs.generate-rootfs.outputs.alpine_version }}-${{ github.run_id }}
           name: "Alpine Base Rootfs: ${{ needs.generate-rootfs.outputs.alpine_version }}"
