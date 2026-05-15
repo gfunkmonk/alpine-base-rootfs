@@ -67,15 +67,16 @@ jobs:
       - name: Create Single Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: rootfs-all-${{ github.run_id }}
-          name: "Alpine Base Rootfs: All Architectures"
+          tag_name: rootfs-${{ needs.generate-rootfs.outputs.alpine_version }}-${{ github.run_id }}
+          name: "Alpine Base Rootfs: ${{ needs.generate-rootfs.outputs.alpine_version }}"
           make_latest: true
           files: all-rootfs/*.tar.zst
           body: |
             ### Consolidated Alpine Base Builds
             Automated multi-arch rootfs generation.
 
-            **Alpine Linux Base Version:** ${{ needs.generate-rootfs.outputs.alpine_version }}
+            **Alpine Linux Base Version:** 
+            - ${{ needs.generate-rootfs.outputs.alpine_version }}
 
             **Included Architectures:**
             - x86_64, x86, aarch64, armv7, armhf
